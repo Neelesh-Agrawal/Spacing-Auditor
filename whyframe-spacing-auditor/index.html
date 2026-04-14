@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Whyframe — Spacing Auditor · Module 03</title>
+  <meta name="description" content="Whyframe Spacing Auditor — generate, audit, and reason about your spacing system. AI-powered design reasoning engine." />
+  <meta name="theme-color" content="#7c3aed" />
+
+  <!-- Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- highlight.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js" defer></script>
+</head>
+<body>
+
+<!-- Animated gradient background -->
+<div class="gradient-bg" aria-hidden="true"></div>
+
+<!-- Copy flash toast -->
+<div id="copy-flash" class="copy-flash" aria-live="polite"></div>
+
+<div class="app-shell">
+
+  <!-- ── Header ──────────────────────────────────────────── -->
+  <header class="site-header">
+    <div class="header-row">
+      <span class="wordmark">Whyframe</span>
+      <span class="module-tag">Module 03 — Spacing Auditor</span>
+    </div>
+    <div class="tagline">design reasoning engine</div>
+  </header>
+
+  <!-- ── Mode Toggle ─────────────────────────────────────── -->
+  <div class="mode-toggle-wrapper">
+    <div class="mode-toggle" role="group" aria-label="Mode selection">
+      <button
+        class="mode-btn active"
+        data-mode="generate"
+        id="mode-generate"
+        aria-pressed="true"
+        type="button"
+      >Generate</button>
+      <button
+        class="mode-btn inactive"
+        data-mode="audit"
+        id="mode-audit"
+        aria-pressed="false"
+        type="button"
+      >Audit</button>
+    </div>
+  </div>
+
+  <!-- ── Selectors bar (always visible) ─────────────────── -->
+  <div class="selectors-bar">
+    <div class="selector-group">
+      <span class="selector-label" id="platform-label">Platform</span>
+      <div class="pill-group" role="radiogroup" aria-labelledby="platform-label">
+        <label>
+          <input type="radio" name="platform" value="web" checked />
+          <span class="pill-label">Web</span>
+        </label>
+        <label>
+          <input type="radio" name="platform" value="mobile" />
+          <span class="pill-label">Mobile</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="selector-group">
+      <span class="selector-label" id="density-label">Density</span>
+      <div class="pill-group" role="radiogroup" aria-labelledby="density-label">
+        <label>
+          <input type="radio" name="density" value="compact" />
+          <span class="pill-label">Compact</span>
+        </label>
+        <label>
+          <input type="radio" name="density" value="default" checked />
+          <span class="pill-label">Default</span>
+        </label>
+        <label>
+          <input type="radio" name="density" value="comfortable" />
+          <span class="pill-label">Comfortable</span>
+        </label>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Main content area ──────────────────────────────── -->
+  <div class="content-area">
+
+    <!-- ── INPUTS COLUMN ──────────────────────────────── -->
+    <div class="inputs-col">
+
+      <!-- ── GENERATE PANEL ──────────────────────────── -->
+      <div id="generate-panel">
+
+        <div class="card">
+          <div class="card-title">Scale configuration</div>
+
+          <!-- Base unit -->
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="base-unit-slider">
+              Base unit <span>(affects linear &amp; geometric scales)</span>
+            </label>
+            <div class="slider-wrap">
+              <input
+                type="range"
+                id="base-unit-slider"
+                min="2"
+                max="16"
+                step="1"
+                value="4"
+                aria-label="Base unit in pixels"
+                style="--fill: 14.28%"
+              />
+              <input
+                type="number"
+                id="base-unit-number"
+                value="4"
+                min="2"
+                max="16"
+                aria-label="Base unit value"
+                class="number-input"
+              />
+              <span class="px-badge">px</span>
+            </div>
+          </div>
+
+          <!-- Scale type -->
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" for="scale-type">Scale type</label>
+            <select id="scale-type" class="form-select" aria-label="Scale type">
+              <option value="4pt-grid">4pt Grid — multiples of 4 (4, 8, 12, 16, 24, 32…)</option>
+              <option value="8pt-grid">8pt Grid — multiples of 8 (8, 16, 24, 32, 48, 64…)</option>
+              <option value="linear">Linear — base × n (4, 8, 12, 16, 20, 24…)</option>
+              <option value="geometric">Geometric 1.5× — base × 1.5^n, round to even</option>
+              <option value="fibonacci">Fibonacci-ish — sum of previous two, snap to 4</option>
+            </select>
+          </div>
+
+          <!-- Steps -->
+          <div class="form-group" style="margin-bottom: 16px;">
+            <label class="form-label" id="steps-label">Steps</label>
+            <div class="segmented" role="group" aria-labelledby="steps-label">
+              <button class="seg-btn" data-steps="8" type="button" aria-label="8 steps">8</button>
+              <button class="seg-btn active" data-steps="12" type="button" aria-label="12 steps">12</button>
+              <button class="seg-btn" data-steps="16" type="button" aria-label="16 steps">16</button>
+            </div>
+          </div>
+
+          <!-- Generate button -->
+          <button
+            id="generate-btn"
+            class="btn-primary"
+            type="button"
+            aria-label="Generate spacing scale and analyze with AI"
+          >
+            <div id="generate-spinner" class="spinner" aria-hidden="true"></div>
+            Generate scale + analyze
+          </button>
+        </div>
+
+        <!-- Project context -->
+        <div class="card">
+          <div class="card-title">Project context <span style="color:#9ca3af;font-size:11px;text-transform:none;letter-spacing:0;font-weight:400;">optional</span></div>
+          <div class="form-group">
+            <label class="form-label sr-only" for="context-area">Project description for AI reasoning</label>
+            <textarea
+              id="context-area"
+              class="form-textarea"
+              placeholder="Describe your project — e.g. 'dense data dashboard' or 'airy marketing site'"
+              maxlength="300"
+              rows="3"
+              aria-label="Project context for AI reasoning"
+            ></textarea>
+            <div id="context-counter" class="char-counter">0 / 300</div>
+          </div>
+        </div>
+
+      </div><!-- /#generate-panel -->
+
+      <!-- ── AUDIT PANEL ──────────────────────────────── -->
+      <div id="audit-panel" class="hidden">
+
+        <!-- Try it examples -->
+        <div class="card">
+          <div class="card-title">Try it — load an example</div>
+          <p class="try-it-desc">New here? Load a real example to see how the auditor works — no knowledge required.</p>
+          <div class="try-it-buttons" role="group" aria-label="Load example spacing system">
+            <button class="try-btn try-btn--broken" data-preset="broken" type="button">
+              <span class="try-btn-icon">💥</span>
+              <span class="try-btn-label">Broken system</span>
+              <span class="try-btn-score">~25/100</span>
+            </button>
+            <button class="try-btn try-btn--messy" data-preset="messy" type="button">
+              <span class="try-btn-icon">🌀</span>
+              <span class="try-btn-label">Messy system</span>
+              <span class="try-btn-score">~58/100</span>
+            </button>
+            <button class="try-btn try-btn--clean" data-preset="clean" type="button">
+              <span class="try-btn-icon">✨</span>
+              <span class="try-btn-label">Clean system</span>
+              <span class="try-btn-score">~95/100</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-title">Paste spacing values</div>
+          <div class="form-group">
+            <label class="form-label" for="paste-area">
+              Any format works — CSS vars, raw numbers, or Figma JSON
+            </label>
+            <textarea
+              id="paste-area"
+              class="form-textarea audit-input"
+              placeholder="4, 8, 12, 16, 24&#10;--space-sm: 8px;&#10;{ &quot;space-sm&quot;: { &quot;value&quot;: &quot;8px&quot; } }"
+              aria-label="Paste spacing values to audit"
+              rows="5"
+            ></textarea>
+            <div id="paste-counter" class="char-counter">0 / 5000</div>
+            <div id="paste-error" class="inline-error hidden" role="alert"></div>
+          </div>
+
+          <button
+            id="audit-btn"
+            class="btn-primary"
+            type="button"
+            aria-label="Audit spacing system"
+            style="margin-top: 12px;"
+          >
+            <div id="audit-spinner" class="spinner" aria-hidden="true"></div>
+            Audit spacing system
+          </button>
+        </div>
+
+        <!-- Project context (shared) -->
+        <div class="card">
+          <div class="card-title">Project context <span style="color:#9ca3af;font-size:11px;text-transform:none;letter-spacing:0;font-weight:400;">optional</span></div>
+          <div class="form-group">
+            <label class="form-label sr-only" for="context-area-audit">Project description</label>
+            <textarea
+              id="context-area-audit"
+              class="form-textarea"
+              placeholder="Describe your project — e.g. 'iOS finance app' or 'dense analytics dashboard'"
+              maxlength="300"
+              rows="3"
+              aria-label="Project context for AI reasoning"
+            ></textarea>
+            <div class="char-counter">optional</div>
+          </div>
+        </div>
+
+      </div><!-- /#audit-panel -->
+
+    </div><!-- /.inputs-col -->
+
+    <!-- ── OUTPUT COLUMN ─────────────────────────────── -->
+    <div class="output-col">
+
+      <!-- Error state -->
+      <div id="output-error" class="card hidden" role="alert" style="color: var(--red); border-color: rgba(239,68,68,0.3); background: rgba(239,68,68,0.05);">
+        <strong>⚠ </strong><span></span>
+      </div>
+
+      <!-- Scale notes -->
+      <div id="scale-notes" class="notes-bar"></div>
+
+      <!-- Empty state -->
+      <div id="output-empty" class="card">
+        <div class="empty-state">
+          <div class="empty-state-icon">◈</div>
+          <div class="empty-state-text">
+            Generate a scale or audit existing values to see your spacing tokens here.
+          </div>
+        </div>
+      </div>
+
+      <!-- Token Table -->
+      <div id="table-section" class="card hidden">
+        <div class="card-title">Token table</div>
+        <div class="token-table-wrap">
+          <table class="token-table" aria-label="Spacing token table">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>px</th>
+                <th class="rem-col">rem</th>
+                <th class="pt-col hidden">pt</th>
+                <th></th>
+              </tr>
+            </thead>
+            <tbody id="token-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Bar chart -->
+      <div id="chart-section" class="card hidden">
+        <div class="card-title">Visual scale</div>
+        <div id="bar-chart" class="bar-chart" aria-label="Spacing scale bar chart"></div>
+      </div>
+
+      <!-- Spacing playground -->
+      <div id="spacing-playground-section" class="card hidden">
+        <div class="card-title">Spacing playground</div>
+        <div class="playground-helper">
+          Visual examples of how your spacing values feel in real layouts.
+        </div>
+        <div id="spacing-playground" class="spacing-playground" aria-label="Spacing usage visual examples"></div>
+      </div>
+
+      <!-- Health Score (audit only) -->
+      <div id="score-section" class="card hidden">
+        <div class="card-title">Health score</div>
+        <div class="score-display">
+          <div class="score-ring-wrap">
+            <div id="score-number" class="score-number green">—</div>
+          </div>
+          <div id="score-label" class="score-label">—</div>
+          <div class="score-bar-wrap">
+            <div id="score-bar" class="score-bar-fill green" style="width: 0%"></div>
+          </div>
+          <div class="score-breakdown">
+            <button class="breakdown-toggle" id="breakdown-toggle" type="button">Show breakdown</button>
+            <div id="breakdown-list" class="breakdown-list hidden"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Audit Flags (audit only) -->
+      <div id="flags-section" class="card hidden">
+        <div class="card-title">Audit flags</div>
+        <div id="flags-list"></div>
+      </div>
+
+      <!-- AI Reasoning -->
+      <div class="card">
+        <div class="card-title">Why this works <span style="color:#a78bfa;font-family:'Space Mono',monospace;font-size:10px;letter-spacing:0.05em;text-transform:none;">— explained by Whyframe ✦</span></div>
+        <div id="ai-panel">
+          <div class="empty-state">
+            <div class="empty-state-icon">✦</div>
+            <div class="empty-state-text">Generate a scale or audit values — Whyframe will explain the reasoning behind every decision.</div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /.output-col -->
+
+    <!-- ── EXPORT PANEL ─────────────────────────────── -->
+    <div class="export-row">
+      <div class="card">
+        <div class="card-title" style="margin-bottom: 12px;">Export</div>
+
+        <!-- Tab row -->
+        <div class="export-tabs-wrap">
+          <div class="export-tabs" role="tablist" aria-label="Export format tabs">
+            <button class="export-tab-btn active" data-tab="css-vars"    role="tab" aria-selected="true"  type="button" title="Paste into your CSS file inside :root {}">CSS Vars</button>
+            <button class="export-tab-btn"         data-tab="css-classes" role="tab" aria-selected="false" type="button" title="Apply directly as class names in HTML">CSS Classes</button>
+            <button class="export-tab-btn"         data-tab="tailwind"    role="tab" aria-selected="false" type="button" title="Paste into tailwind.config.js theme.extend.spacing">Tailwind</button>
+            <button class="export-tab-btn"         data-tab="figma"       role="tab" aria-selected="false" type="button" title="Import via Figma Tokens plugin">Figma Tokens</button>
+            <button class="export-tab-btn hidden"  data-tab="swift"       role="tab" aria-selected="false" type="button" title="Use in SwiftUI / UIKit spacers">Swift</button>
+            <button class="export-tab-btn"         data-tab="svg"         role="tab" aria-selected="false" type="button" title="Download and open as editable vectors in Figma">SVG</button>
+          </div>
+        </div>
+        <div id="export-usage-hint" class="export-usage-hint"></div>
+
+        <!-- Actions -->
+        <div id="export-actions" class="export-actions hidden">
+          <button id="export-copy-btn" class="btn-ghost" type="button">Copy all</button>
+          <button id="export-dl-btn"   class="btn-ghost" type="button">Download</button>
+        </div>
+
+        <!-- Code content -->
+        <div id="export-code">
+          <div class="empty-state" style="padding: 30px 0">
+            <div class="empty-state-text">Generate or audit a scale to see export formats.</div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /.export-row -->
+
+  </div><!-- /.content-area -->
+
+</div><!-- /.app-shell -->
+
+<script type="module" src="app.js"></script>
+
+</body>
+</html>
